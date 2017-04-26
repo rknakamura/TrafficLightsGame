@@ -1,10 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-//Constantes para mapear as possíveis jogadas.
-char vermelho = '-', amarelo = '+', verde = '#';
-
-
 /*
 Função responsável por definir a modalidade do jogo, sendo:
 
@@ -47,6 +43,35 @@ int SelecionarColuna() {
 	return coluna;
 }
 
+//Posiciona um valor no tabuleiro: vermelho, amarelo ou verde.
+void RealizarJogada(char tabuleiro[3][4], int linha, int coluna) {
+	switch (tabuleiro[linha][coluna]) {
+		case ' ':
+			tabuleiro[linha][coluna] = '-';
+			break;
+
+		case '-':
+			tabuleiro[linha][coluna] = '+';
+			break;
+
+		case '+':
+			tabuleiro[linha][coluna] = '#';
+			break;
+	}
+}
+
+/*Função para validar se a posição selecionada contém o valor "verde".
+Caso valor da posição selecionada seja "verde", a jogada é invalidada.
+*/
+int ValidarPosicaoTabuleiro(char tabuleiro[3][4], int linha, int coluna) {
+	if (tabuleiro[linha][coluna] == '#') {
+		printf("Jogada inválida, por favor, jogue novamente. \n");
+		return 0;
+	}
+		
+	return 1;
+}
+
 //Função utilizada para mostrar o tabuleiro atualizado.
 void MostrarTabuleiro(char tabuleiro[3][4]) {
 
@@ -57,13 +82,12 @@ void MostrarTabuleiro(char tabuleiro[3][4]) {
 	}
 }
 
-
 /*
 Função para verificar se o jogo terminou.
 Caso as condições para o termino do jogo sejam satisfeitas a função retorna 1,
 caso contrario ela retorna 0, indicando que o jogo continua.
 */
-int ValidaFinalJogo(char tabuleiro[3][4]) {
+int ValidarJogoTerminou(char tabuleiro[3][4]) {
 
 	//Valida colunas
 	for (int i = 0; i < 4; i++) {
@@ -89,9 +113,20 @@ int ValidaFinalJogo(char tabuleiro[3][4]) {
 }
 
 
-void PlayerVsPlayer(char tabuleiro[3][4]) {
-	
+
+void PlayerVsPlayer() {
+	char tabuleiro[3][4];
+	int linha, coluna, jogadas = 0;
+
+	InicializaTabuleiro(tabuleiro);
+
+	while (ValidarJogoTerminou(tabuleiro) != 1) {
+		MostrarTabuleiro(tabuleiro);
+
+		
+	}
 }
+
 
 void PlayerVsComputador() {
 
@@ -113,7 +148,6 @@ void main()
 	int linha, coluna;
 
 	InicializaTabuleiro(tabuleiro);
-	MostrarTabuleiro(tabuleiro);
 
 	int modoJogo = SelecionarModoJogo();
 
