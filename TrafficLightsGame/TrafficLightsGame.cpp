@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <conio.h>
 /*
 Função responsável por definir a modalidade do jogo, sendo:
 
@@ -15,7 +15,7 @@ int SelecionarModoJogo() {
 		scanf("%d", &modo);
 	}
 
-	system("CLS");
+	system("cls");
 	return modo;
 }
 
@@ -23,7 +23,7 @@ int SelecionarModoJogo() {
 int SelecionarLinha() {
 	int linha = 0;
 
-	while (linha < 1 && linha > 3) {
+	while (linha < 1 || linha > 3) {
 		printf("Selecione a linha em que deseja jogar: ");
 		scanf("%d", &linha);
 	}
@@ -35,7 +35,7 @@ int SelecionarLinha() {
 int SelecionarColuna() {
 	int coluna = 0;
 
-	while (coluna < 1 && coluna > 4) {
+	while (coluna < 1 || coluna > 4) {
 		printf("Selecione a coluna em que deseja jogar: ");
 		scanf("%d", &coluna);
 	}
@@ -64,22 +64,30 @@ void RealizarJogada(char tabuleiro[3][4], int linha, int coluna) {
 Caso valor da posição selecionada seja "verde", a jogada é invalidada.
 */
 int ValidarPosicaoTabuleiro(char tabuleiro[3][4], int linha, int coluna) {
-	if (tabuleiro[linha][coluna] == '#') {
-		printf("Jogada inválida, por favor, jogue novamente. \n");
-		return 0;
-	}
+	if (tabuleiro[linha][coluna] == '#')
+		return 0;	
 		
 	return 1;
 }
 
-//Função utilizada para mostrar o tabuleiro atualizado.
-void MostrarTabuleiro(char tabuleiro[3][4]) {
+//Função utilizada para mostrar a tela do jogo.
+void MostrarTelaJogo(char tabuleiro[3][4], int jogadas, int jogadaValida, int jogoAcabou) {
+	int jogador = (jogadas - jogoAcabou) % 2;
 
+	system("cls");
 	printf("    1    2    3    4 \n");
 
 	for (int i = 0; i < 3; i++) {
 		printf("%d [ %c ][ %c ][ %c ][ %c ] \n", i+1, tabuleiro[i][0], tabuleiro[i][1], tabuleiro[i][2], tabuleiro[i][3]);
-	}
+	}	
+
+	if (jogadaValida == 0)
+		printf("Jogada realizada foi inválida, por favor jogue novamente. \n");
+
+	if (jogoAcabou == 0)
+		printf("Turno do jogador %d. \n", jogador + 1);
+	else 
+		printf("Jogador %d venceu!. \n", jogador + 1);
 }
 
 /*
@@ -112,26 +120,6 @@ int ValidarJogoTerminou(char tabuleiro[3][4]) {
 	return 0;
 }
 
-
-
-void PlayerVsPlayer() {
-	char tabuleiro[3][4];
-	int linha, coluna, jogadas = 0;
-
-	InicializaTabuleiro(tabuleiro);
-
-	while (ValidarJogoTerminou(tabuleiro) != 1) {
-		MostrarTabuleiro(tabuleiro);
-
-		
-	}
-}
-
-
-void PlayerVsComputador() {
-
-}
-
 //Inicializa o tabuleiro, mudando os valores para vazio.
 void InicializaTabuleiro(char tabuleiro[3][4]) {
 	for (int i = 0; i < 3; i++) {
@@ -139,6 +127,34 @@ void InicializaTabuleiro(char tabuleiro[3][4]) {
 			tabuleiro[i][j] = ' ';
 		}
 	}
+}
+
+void PlayerVsPlayer() {
+	char tabuleiro[3][4];
+	int linha, coluna, jogadas = 0, jogadaValida = 1;
+
+	InicializaTabuleiro(tabuleiro);
+
+	while (ValidarJogoTerminou(tabuleiro) != 1) {
+		MostrarTelaJogo(tabuleiro, jogadas, jogadaValida, 0);
+
+		linha = SelecionarLinha() - 1;
+		coluna = SelecionarColuna() - 1;
+
+		jogadaValida = ValidarPosicaoTabuleiro(tabuleiro, linha, coluna);
+
+		if (jogadaValida == 1) {
+			RealizarJogada(tabuleiro, linha, coluna);
+			jogadas++;
+		}
+	}
+
+	MostrarTelaJogo(tabuleiro, jogadas, jogadaValida, 1);
+	getch();
+}
+
+void PlayerVsComputador() {
+
 }
 
 //Função principal
