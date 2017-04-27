@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
+
 /*
 Função responsável por definir a modalidade do jogo, sendo:
 
@@ -129,47 +130,86 @@ void InicializaTabuleiro(char tabuleiro[3][4]) {
 	}
 }
 
-void PlayerVsPlayer() {
-	char tabuleiro[3][4];
-	int linha, coluna, jogadas = 0, jogadaValida = 1;
+int ValidarJogadaComputadorVencer(char tabuleiro[3][4]) {
+	char aux = ' ';
 
-	InicializaTabuleiro(tabuleiro);
-
-	while (ValidarJogoTerminou(tabuleiro) != 1) {
-		MostrarTelaJogo(tabuleiro, jogadas, jogadaValida, 0);
-
-		linha = SelecionarLinha() - 1;
-		coluna = SelecionarColuna() - 1;
-
-		jogadaValida = ValidarPosicaoTabuleiro(tabuleiro, linha, coluna);
-
-		if (jogadaValida == 1) {
-			RealizarJogada(tabuleiro, linha, coluna);
-			jogadas++;
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 4; j++)
+		{
+			aux = tabuleiro[i][j];
+			RealizarJogada(tabuleiro, i, j);
+			if (ValidarJogoTerminou(tabuleiro) == 1)
+				return 1;
+			else
+				tabuleiro[i][j] = aux;
 		}
 	}
 
-	MostrarTelaJogo(tabuleiro, jogadas, jogadaValida, 1);
-	getch();
+	return 0;
 }
 
-void PlayerVsComputador() {
+int RealizarJogadaComputador(char tabuleiro[3][4]) {
+	char aux = ' ';
 
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 4; j++)
+		{
+			if (tabuleiro[i][j] != '#') {
+				aux = tabuleiro[i][j];
+				RealizarJogada(tabuleiro, i, j);
+				if (ValidarJogadaComputadorVencer(tabuleiro) == 1)
+					tabuleiro[i][j] = aux;
+				else
+					return 1;
+			}
+		}
+	}
+
+	return 0;
 }
 
 //Função principal
 void main()
-{
+{	
 	char tabuleiro[3][4];
-	int linha, coluna;
-
-	InicializaTabuleiro(tabuleiro);
+	int linha, coluna, jogadas = 0, jogadaValida = 1, jogoAcabou = 0;
 
 	int modoJogo = SelecionarModoJogo();
 
-	if (modoJogo == 1)
-		PlayerVsComputador();
-	else
-		PlayerVsPlayer();
+	InicializaTabuleiro(tabuleiro);
+
+	while (jogoAcabou == 0) {
+		
+		if ((modoJogo == 2) || (modoJogo == 1 && jogadas % 2 == 0)) {
+			MostrarTelaJogo(tabuleiro, jogadas, jogadaValida, 0);
+
+			linha = SelecionarLinha() - 1;
+			coluna = SelecionarColuna() - 1;
+
+			jogadaValida = ValidarPosicaoTabuleiro(tabuleiro, linha, coluna);
+
+			if (jogadaValida == 1) {
+				RealizarJogada(tabuleiro, linha, coluna);
+				jogadas++;
+			}
+
+			jogoAcabou = ValidarJogoTerminou(tabuleiro);
+		}
+		else {
+			jogadas++;
+			if (ValidarJogadaComputadorVencer(tabuleiro) == 0) {
+				if (RealizarJogadaComputador(tabuleiro) == 0) {
+					jogoAcabou == 1;
+					jogadas--;
+				}
+			}
+			else
+				jogoAcabou = ValidarJogoTerminou(tabuleiro);
+		}
+	}
+
+	MostrarTelaJogo(tabuleiro, jogadas, jogadaValida, jogoAcabou);
+	getch();
 }
+	
 
